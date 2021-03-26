@@ -24,9 +24,6 @@
                     <name>Redfish Generic Information</name>
                 </application>
                 <application>
-                    <name>Redfish iDRAC Information</name>
-                </application>
-                <application>
                     <name>Redfish Memory Information</name>
                 </application>
                 <application>
@@ -897,7 +894,7 @@
                 </macro>
                 <macro>
                     <macro>{$PASSWORD}</macro>
-                    <value>0penBmc</value>
+                    <value>somepass</value>
                 </macro>
                 <macro>
                     <macro>{$SYSTEM}</macro>
@@ -909,7 +906,7 @@
                 </macro>
                 <macro>
                     <macro>{$USER}</macro>
-                    <value>root</value>
+                    <value>user</value>
                 </macro>
             </macros>
         </template>
