@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-03-25T12:57:07Z</date>
+    <date>2021-03-31T14:58:16Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -27,16 +27,13 @@
                     <name>Redfish Memory Information</name>
                 </application>
                 <application>
-                    <name>Redfish PowerSource Information</name>
+                    <name>Redfish Power Information</name>
                 </application>
                 <application>
                     <name>Redfish Processors Information</name>
                 </application>
                 <application>
                     <name>Redfish Sensors Information</name>
-                </application>
-                <application>
-                    <name>Redfish Storage Information</name>
                 </application>
                 <application>
                     <name>Redfish Thermal Information</name>
@@ -52,7 +49,7 @@
                     <value_type>TEXT</value_type>
                     <applications>
                         <application>
-                            <name>Redfish PowerSource Information</name>
+                            <name>Redfish Power Information</name>
                         </application>
                     </applications>
                 </item>
@@ -73,33 +70,9 @@
                     <name>Collect Generic Systems Info</name>
                     <type>EXTERNAL</type>
                     <key>redfish-collect[{$USER},{$PASSWORD},{$IPMI},/redfish/v1/Systems/{$SYSTEM}]</key>
-                    <delay>30m</delay>
+                    <delay>5m</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
-                    <applications>
-                        <application>
-                            <name>Redfish Generic Information</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>Amount of Physical Memory</name>
-                    <type>EXTERNAL</type>
-                    <key>redfish-reader[{$IPMI}-system.json,MemorySummary.TotalSystemMemoryGiB]</key>
-                    <delay>1h</delay>
-                    <trends>0</trends>
-                    <value_type>TEXT</value_type>
-                    <applications>
-                        <application>
-                            <name>Redfish Generic Information</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>Amount of Processors</name>
-                    <type>EXTERNAL</type>
-                    <key>redfish-reader[{$IPMI}-system.json,ProcessorSummary.Count]</key>
-                    <delay>1h</delay>
                     <applications>
                         <application>
                             <name>Redfish Generic Information</name>
@@ -153,6 +126,19 @@
                     </triggers>
                 </item>
                 <item>
+                    <name>Amount of Physical Memory</name>
+                    <type>EXTERNAL</type>
+                    <key>redfish-reader[{$IPMI}-{$SYSTEM}.json,MemorySummary.TotalSystemMemoryGiB]</key>
+                    <delay>1h</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Redfish Generic Information</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
                     <name>Server Model</name>
                     <type>EXTERNAL</type>
                     <key>redfish-reader[{$IPMI}-{$SYSTEM}.json,Model]</key>
@@ -197,6 +183,19 @@
                             <priority>HIGH</priority>
                         </trigger>
                     </triggers>
+                </item>
+                <item>
+                    <name>Amount of Processors</name>
+                    <type>EXTERNAL</type>
+                    <key>redfish-reader[{$IPMI}-{$SYSTEM}.json,ProcessorSummary.Count]</key>
+                    <delay>1h</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Redfish Generic Information</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>Processor Model</name>
@@ -305,6 +304,13 @@
                                     <name>Redfish Fans Information</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{iregexp(OK)}=0 and {iregexp(no batch file yet)}=0 and {iregexp(null)}=0</expression>
+                                    <name>Fan {#NAME} is not Healthy</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Fans {#NAME} $4 {$IPMI}</name>
@@ -456,6 +462,13 @@
                                     <name>Redfish Memory Information</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{iregexp(no batch file yet)}=0 and {iregexp(OK)}=0 and {iregexp(null)}=0</expression>
+                                    <name>Memory {#FILENAME} is not Healthy</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Memory {#FILENAME} $2</name>
@@ -486,7 +499,19 @@
                             <units>Volts</units>
                             <applications>
                                 <application>
-                                    <name>Redfish PowerSource Information</name>
+                                    <name>Redfish Power Information</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Power {#NAME} $4 {$IPMI}</name>
+                            <type>EXTERNAL</type>
+                            <key>g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},LowerThresholdNonCritical,{#POWER}]</key>
+                            <value_type>FLOAT</value_type>
+                            <units>Volts</units>
+                            <applications>
+                                <application>
+                                    <name>Redfish Power Information</name>
                                 </application>
                             </applications>
                         </item_prototype>
@@ -498,7 +523,7 @@
                             <units>Volts</units>
                             <applications>
                                 <application>
-                                    <name>Redfish PowerSource Information</name>
+                                    <name>Redfish Power Information</name>
                                 </application>
                             </applications>
                         </item_prototype>
@@ -510,9 +535,16 @@
                             <value_type>TEXT</value_type>
                             <applications>
                                 <application>
-                                    <name>Redfish PowerSource Information</name>
+                                    <name>Redfish Power Information</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{iregexp(OK)}=0 and {iregexp(null)}=0 and {iregexp(no batch file yet)}=0</expression>
+                                    <name>Power {#NAME} is not Healthy</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Power {#NAME} $4 {$IPMI}</name>
@@ -522,11 +554,28 @@
                             <units>Volts</units>
                             <applications>
                                 <application>
-                                    <name>Redfish PowerSource Information</name>
+                                    <name>Redfish Power Information</name>
                                 </application>
                             </applications>
                         </item_prototype>
                     </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},ReadingVolts,{#POWER}].last()}&gt;={Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},UpperThresholdCritical,{#POWER}].last()}</expression>
+                            <name>Voltage {#NAME} is extremely high at {ITEM.LASTVALUE}</name>
+                            <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},ReadingVolts,{#POWER}].last()}&lt;={Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},LowerThresholdCritical,{#POWER}].last()}</expression>
+                            <name>Voltage {#NAME} is extremely low at {ITEM.LASTVALUE}</name>
+                            <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},ReadingVolts,{#POWER}].last()}&lt;={Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Power.json,Voltages,{#NAME},LowerThresholdNonCritical,{#POWER}].last()}</expression>
+                            <name>Voltage {#NAME} is pretty low at {ITEM.LASTVALUE}</name>
+                            <priority>WARNING</priority>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
                             <name>Power {#NAME} {#POWER}</name>
@@ -569,7 +618,7 @@
                             <name>Collect Processors Data {#FILENAME}</name>
                             <type>EXTERNAL</type>
                             <key>redfish-collect[{$USER},{$PASSWORD},{$IPMI},{#PROCESSORS}]</key>
-                            <delay>5m</delay>
+                            <delay>15m</delay>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
                             <applications>
@@ -620,7 +669,7 @@
                             <name>Processor {#FILENAME} $2</name>
                             <type>EXTERNAL</type>
                             <key>redfish-reader[{#FILENAME},Model,{#PROCESSORS}]</key>
-                            <delay>5m</delay>
+                            <delay>1h</delay>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
                             <applications>
@@ -646,7 +695,7 @@
                             <name>Processor {#FILENAME} $2</name>
                             <type>EXTERNAL</type>
                             <key>redfish-reader[{#FILENAME},Status.Health,{#PROCESSORS}]</key>
-                            <delay>5m</delay>
+                            <delay>15m</delay>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
                             <applications>
@@ -791,6 +840,13 @@
                                     <name>Redfish Sensors Information</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{iregexp(no batch file yet)}=0 and {iregexp(null)}=0 and {iregexp(OK)}=0</expression>
+                                    <name>Sensor {#FILENAME} is not Healthy</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Sensors {#FILENAME} $2</name>
@@ -849,6 +905,13 @@
                                     <name>Redfish Thermal Information</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{iregexp(OK)}=0 and {iregexp(no batch file yet)}=0 and {iregexp(null)}=0</expression>
+                                    <name>Temperature {#NAME} is not Healthy</name>
+                                    <priority>DISASTER</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>Temperatures {#NAME} $4 {$IPMI}</name>
@@ -861,7 +924,30 @@
                                 </application>
                             </applications>
                         </item_prototype>
+                        <item_prototype>
+                            <name>Temperatures {#NAME} $4 {$IPMI}</name>
+                            <type>EXTERNAL</type>
+                            <key>g-redfish-reader[{$IPMI}-Thermal.json,Temperatures,{#NAME},UpperThresholdNonCritical,{#THERMAL}]</key>
+                            <units>C</units>
+                            <applications>
+                                <application>
+                                    <name>Redfish Thermal Information</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
                     </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Thermal.json,Temperatures,{#NAME},ReadingCelsius,{#THERMAL}].last()}&gt;={Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Thermal.json,Temperatures,{#NAME},UpperThresholdCritical,{#THERMAL}].last()}</expression>
+                            <name>Temperature {#NAME} is extremely high at {ITEM.LASTVALUE}</name>
+                            <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Thermal.json,Temperatures,{#NAME},ReadingCelsius,{#THERMAL}].last()}&gt;={Template Hw Gagarin Redfish LLD:g-redfish-reader[{$IPMI}-Thermal.json,Temperatures,{#NAME},UpperThresholdNonCritical,{#THERMAL}].last()}</expression>
+                            <name>Temperature {#NAME} is pretty high at {ITEM.LASTVALUE}</name>
+                            <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
                             <name>Temperatures {#NAME} {#TEMPERATURES}</name>
@@ -906,7 +992,7 @@
                 </macro>
                 <macro>
                     <macro>{$USER}</macro>
-                    <value>user</value>
+                    <value>root</value>
                 </macro>
             </macros>
         </template>
